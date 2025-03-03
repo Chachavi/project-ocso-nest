@@ -12,33 +12,10 @@ export class ProductsService {
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
   ) {}
-  private products: CreateProductDto[] = [
-    {
-      productName: "Sabritas",
-      price: 25,
-      countSeal: 3,
-      productId: uuid(),
-      provider: uuid(),
-    },
-    {
-      productName: "Bonafont",
-      price: 19,
-      countSeal: 0,
-      productId: uuid(),
-      provider: uuid()
-    },
-    {
-      productName: "Skwinkles",
-      price: 66,
-      countSeal: 4,
-      productId: uuid(),
-      provider: uuid()
-    }
-  ]
+  
   async create(createProductDto: CreateProductDto) {
-  const product = this.productRepository.create(createProductDto)
-  const savedProduct = this.productRepository.save(product);
-  return savedProduct;
+  const product = this.productRepository.save(createProductDto)
+  return product;
   }
 
   findAll() {
@@ -46,34 +23,35 @@ export class ProductsService {
   }
 
   findOne(id: string) {
-    const product = this.products.filter((product) => product.productId === id)[0];
-    if (!product) throw new NotFoundException();
+    const product = this.productRepository.findOneBy({
+      productId: id
+    })
+    if (!product) throw new NotFoundException()
     return product;
   }
 
-  findByProvider(id: string) {
+  /* findByProvider(id: string) {
     const provider = this.products.filter((product) => product.provider === id)[0];
     if (!provider) throw new NotFoundException();
     return provider;
-  }
+  } */
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    let productToUpdate = this.findOne(id);
-    productToUpdate = {
-      ...productToUpdate,
-      ...updateProductDto
-    }
-    this.products = this.products.map((product) => {
-      if (product.productId === id){
-        product = productToUpdate;
-      }
-      return product;
-    })
-    return productToUpdate;
-  }
+ async update(id: string, updateProductDto: UpdateProductDto) {
+   const productToUpdate = await this.productRepository.preload({
+    productId: id,
+    ...updateProductDto
+   })
+   if(!productToUpdate) throw new NotFoundException()
+    this.productRepository.save(productToUpdate)
+   return productToUpdate;
+  } 
 
   remove(id: string) {
-    this.products = this.products.filter((product) => product.productId != id);
-    return this.products;
+    this.productRepository.delete({
+      productId: id
+    })
+    return {
+      message: `El producto con el id ${id} fue eliminado con exito`
+    }
   }
 }

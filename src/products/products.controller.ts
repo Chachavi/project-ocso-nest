@@ -25,7 +25,7 @@ export class ProductsController {
   @Patch(':id')
   update(@Param('id', new ParseUUIDPipe({version: '4'})) id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
-  }
+  } 
 
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe({version: '4'})) id: string) {
