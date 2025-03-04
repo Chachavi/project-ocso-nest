@@ -11,6 +11,6 @@ export class Product {
     price: number;
     @Column({type: "int"})
     countSeal: number;
-   // @Column({type: "uuid"})
-    // provider: string
+    @Column({type: "uuid",  default: () => "uuid_generate_v4()" })
+    provider: string
 }

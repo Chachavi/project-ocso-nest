@@ -30,11 +30,13 @@ export class ProductsService {
     return product;
   }
 
-  /* findByProvider(id: string) {
-    const provider = this.products.filter((product) => product.provider === id)[0];
-    if (!provider) throw new NotFoundException();
-    return provider;
-  } */
+  async findByProvider(id: string) {
+   const productByProvider = await this.productRepository.findOne({
+    where: {provider: id}
+   })
+   if(!productByProvider) throw new NotFoundException()
+   return productByProvider;
+  } 
 
  async update(id: string, updateProductDto: UpdateProductDto) {
    const productToUpdate = await this.productRepository.preload({
@@ -51,7 +53,7 @@ export class ProductsService {
       productId: id
     })
     return {
-      message: `El producto con el id ${id} fue eliminado con exito`
+      message: `Product with ID ${id} successfully deleted`
     }
   }
 }
